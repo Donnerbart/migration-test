@@ -2,8 +2,6 @@ package com.hazelcast.migration.loadsupport;
 
 import com.hazelcast.core.IMap;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * Creates {@link Streamer} instances for {@link IMap}.
  *

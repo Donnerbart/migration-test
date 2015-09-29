@@ -9,21 +9,18 @@ import com.hazelcast.migration.domain.DomainObject;
 import com.hazelcast.migration.domain.DomainObjectFactory;
 import com.hazelcast.migration.loadsupport.Streamer;
 import com.hazelcast.migration.loadsupport.StreamerFactory;
-import org.apache.commons.lang3.RandomStringUtils;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import static com.hazelcast.migration.Constants.CLUSTER_SIZE;
+import static com.hazelcast.migration.Constants.ITEM_COUNT;
 import static com.hazelcast.migration.Constants.RECORDS_PER_UNIQUE;
 import static com.hazelcast.migration.Constants.STRATEGY;
 import static com.hazelcast.migration.Constants.USE_ASYNC_STREAMER;
-import static com.hazelcast.migration.Constants.ITEM_COUNT;
+import static com.hazelcast.migration.Utils.createNewDomainObject;
+import static com.hazelcast.migration.Utils.generateUniqueStrings;
+import static com.hazelcast.migration.Utils.waitClusterSize;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.commons.lang3.RandomUtils.nextDouble;
-import static org.apache.commons.lang3.RandomUtils.nextInt;
-import static org.apache.commons.lang3.RandomUtils.nextLong;
 
 public class WarmupClient {
 
@@ -70,35 +67,5 @@ public class WarmupClient {
 
         // leave cluster
         instance.shutdown();
-    }
-
-    private static void waitClusterSize(HazelcastInstance hz, int clusterSize) throws InterruptedException {
-        while (true) {
-            int actualClusterSize = hz.getCluster().getMembers().size();
-            if (actualClusterSize >= clusterSize) {
-                return;
-            }
-            System.out.println(format("Cluster size is %d/%d", actualClusterSize, clusterSize));
-            Thread.sleep(1000);
-        }
-    }
-
-    private static Set<String> generateUniqueStrings(int uniqueStringsCount) {
-        Set<String> stringsSet = new HashSet<String>(uniqueStringsCount);
-        do {
-            String randomString = RandomStringUtils.randomAlphabetic(30);
-            stringsSet.add(randomString);
-        } while (stringsSet.size() != uniqueStringsCount);
-        return stringsSet;
-    }
-
-    private static DomainObject createNewDomainObject(DomainObjectFactory objectFactory, String indexedField) {
-        DomainObject object = objectFactory.newInstance();
-        object.setKey(randomAlphanumeric(7));
-        object.setStringVal(indexedField);
-        object.setIntVal(nextInt(0, Integer.MAX_VALUE));
-        object.setLongVal(nextLong(0, Long.MAX_VALUE));
-        object.setDoubleVal(nextDouble(0.0, Double.MAX_VALUE));
-        return object;
     }
 }

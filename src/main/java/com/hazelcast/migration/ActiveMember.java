@@ -17,6 +17,8 @@ import java.util.Set;
 import static com.hazelcast.migration.Constants.CHECK_QUERY_RESULT;
 import static com.hazelcast.migration.Constants.QUERY_COUNT;
 import static com.hazelcast.migration.Constants.RECORDS_PER_UNIQUE;
+import static com.hazelcast.migration.Constants.REPORT_PARTITION_COUNT_INTERVAL;
+import static com.hazelcast.migration.Utils.getLocalPartitionsCount;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -66,6 +68,9 @@ public class ActiveMember {
                     throw new RuntimeException("got duplicate objects!");
                 }
                 objectKeys.clear();
+            }
+            if (i % REPORT_PARTITION_COUNT_INTERVAL == 0) {
+                System.out.println("Partition count: " + getLocalPartitionsCount(instance));
             }
         }
         System.out.println("Done!");
