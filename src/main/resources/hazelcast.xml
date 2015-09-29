@@ -5,6 +5,13 @@
            xmlns="http://www.hazelcast.com/schema/config"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
+    <properties>
+        <property name="hazelcast.health.monitoring.level">NOISY</property>
+        <property name="hazelcast.health.monitoring.delay.seconds">10</property>
+        <property name="hazelcast.slow.operation.detector.threshold.millis">2000</property>
+        <property name="hazelcast.slow.operation.detector.stacktrace.logging.enabled">true</property>
+    </properties>
+
     <network>
         <join>
             <multicast enabled="true">
