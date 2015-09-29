@@ -10,7 +10,6 @@ import com.hazelcast.migration.domain.DomainObjectFactory;
 import com.hazelcast.migration.loadsupport.Streamer;
 import com.hazelcast.migration.loadsupport.StreamerFactory;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,8 +31,8 @@ public class WarmupClient {
         stopSignal.trySetCount(1);
 
         // prepare data
-        System.out.println("Prepare data...");
-        int uniqueStringsCount = Constants.ITEM_COUNT / Constants.RECORDS_PER_UNIQUE;
+        int uniqueStringsCount = (int) Math.ceil(Constants.ITEM_COUNT / Constants.RECORDS_PER_UNIQUE);
+        System.out.println(format("Prepare data (%d unique Strings)...", uniqueStringsCount));
         Set<String> stringsSet = generateUniqueStrings(uniqueStringsCount);
 
         ISet<String> set = instance.getSet("set");
@@ -48,8 +47,10 @@ public class WarmupClient {
         IMap<String, DomainObject> map = instance.getMap("map");
         Streamer<String, DomainObject> streamer = StreamerFactory.getInstance(map, Constants.ASYNC_STREAMER);
         DomainObjectFactory objectFactory = DomainObjectFactory.newFactory(Constants.STRATEGY);
+
         for (int i = 0; i < Constants.ITEM_COUNT; i++) {
-            String indexedField = strings[RandomUtils.nextInt(0, uniqueStringsCount)];
+            int index = i % uniqueStringsCount;
+            String indexedField = strings[index];
             DomainObject object = createNewDomainObject(objectFactory, indexedField);
             streamer.pushEntry(object.getKey(), object);
         }
