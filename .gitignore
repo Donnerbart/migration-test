@@ -1,0 +1,10 @@
+*.csv
+target/
+.project
+.classpath
+.settings/
+.idea/
+.patch
+*.iml
+.DS_Store
+*.log

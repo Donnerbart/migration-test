@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<hazelcast xsi:schemaLocation="http://www.hazelcast.com/schema/config
+                               http://www.hazelcast.com/schema/config/hazelcast-config-3.5.xsd"
+           xmlns="http://www.hazelcast.com/schema/config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <network>
+        <join>
+            <multicast enabled="true">
+            </multicast>
+        </join>
+    </network>
+
+    <serialization>
+        <portable-version>1</portable-version>
+
+        <data-serializable-factories>
+            <data-serializable-factory factory-id="2000">
+                com.hazelcast.migration.domain.IdentifiedDataSerializableObjectFactory
+            </data-serializable-factory>
+        </data-serializable-factories>
+
+        <portable-factories>
+            <portable-factory factory-id="10000000">
+                com.hazelcast.migration.domain.PortableObjectFactory
+            </portable-factory>
+        </portable-factories>
+    </serialization>
+
+    <map name="map">
+        <in-memory-format>BINARY</in-memory-format>
+        <backup-count>1</backup-count>
+        <async-backup-count>0</async-backup-count>
+        <eviction-policy>NONE</eviction-policy>
+        <max-size policy="PER_NODE">0</max-size>
+        <eviction-percentage>25</eviction-percentage>
+        <merge-policy>com.hazelcast.map.merge.LatestUpdateMapMergePolicy</merge-policy>
+        <indexes>
+            <index ordered="false">stringVal</index>
+        </indexes>
+    </map>
+
+</hazelcast>
