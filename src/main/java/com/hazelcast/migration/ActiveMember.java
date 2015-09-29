@@ -19,6 +19,7 @@ import static com.hazelcast.migration.Constants.QUERY_COUNT;
 import static com.hazelcast.migration.Constants.RECORDS_PER_UNIQUE;
 import static com.hazelcast.migration.Constants.REPORT_PARTITION_COUNT_INTERVAL;
 import static com.hazelcast.migration.Utils.getLocalPartitionsCount;
+import static com.hazelcast.migration.Utils.getOwnedPartitions;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -70,7 +71,10 @@ public class ActiveMember {
                 objectKeys.clear();
             }
             if (i % REPORT_PARTITION_COUNT_INTERVAL == 0) {
-                System.out.println("Partition count: " + getLocalPartitionsCount(instance));
+                int localPartitionCount = getLocalPartitionsCount(instance);
+                Collection<Integer> ownedPartitions = getOwnedPartitions(instance);
+                System.out.println(format("Local partitions: %d vs. %d: %s", localPartitionCount, ownedPartitions.size(),
+                        ownedPartitions));
             }
         }
         System.out.println("Done!");

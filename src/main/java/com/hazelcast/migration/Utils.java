@@ -3,13 +3,16 @@ package com.hazelcast.migration;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
 import com.hazelcast.core.Partition;
+import com.hazelcast.map.impl.MapService;
 import com.hazelcast.migration.domain.DomainObject;
 import com.hazelcast.migration.domain.DomainObjectFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.hazelcast.instance.TestUtil.getNode;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomUtils.nextDouble;
@@ -61,5 +64,14 @@ public final class Utils {
             }
         }
         return count;
+    }
+
+    public static Collection<Integer> getOwnedPartitions(HazelcastInstance instance) {
+        MapService mapService = getMapService(instance);
+        return mapService.getMapServiceContext().getOwnedPartitions();
+    }
+
+    private static MapService getMapService(HazelcastInstance instance) {
+        return (MapService) getNode(instance).getNodeEngine().getService(MapService.SERVICE_NAME);
     }
 }
