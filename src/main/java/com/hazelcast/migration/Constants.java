@@ -8,6 +8,7 @@ public class Constants {
 
     public static final int CLUSTER_SIZE = 3;
     public static final boolean ASYNC_STREAMER = true;
+    public static final boolean CHECK_QUERY_RESULT = false;
 
     public static final int ITEM_COUNT = 1000000;
     public static final int RECORDS_PER_UNIQUE = 10000;

@@ -10,7 +10,9 @@ import com.hazelcast.query.Predicate;
 import com.hazelcast.query.Predicates;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
@@ -38,14 +40,29 @@ public class ActiveMember {
         // query map
         System.out.println("Starting queries...");
         IMap<String, DomainObject> map = instance.getMap("map");
+        Set<String> objectKeys = new HashSet<String>();
         for (int i = 1; i <= Constants.QUERY_COUNT; i++) {
             String string = uniqueStrings[random.nextInt(uniqueStrings.length)];
             Predicate predicate = Predicates.equal("stringVal", string);
 
             long started = System.nanoTime();
-            Collection<DomainObject> results = map.values(predicate);
+            Collection<DomainObject> objects = map.values(predicate);
             long diff = System.nanoTime() - started;
-            System.out.println(format("#%5d Query took %5d ms (%d results)", i, TimeUnit.NANOSECONDS.toMillis(diff), results.size()));
+            System.out.println(format("#%5d Query took %5d ms (%d results)", i, TimeUnit.NANOSECONDS.toMillis(diff), objects.size()));
+
+            // check received objects
+            if (Constants.CHECK_QUERY_RESULT) {
+                for (DomainObject object : objects) {
+                    if (object == null) {
+                        throw new RuntimeException("returned object is null");
+                    }
+                    objectKeys.add(object.getKey());
+                }
+                if (objectKeys.size() != Constants.RECORDS_PER_UNIQUE) {
+                    throw new RuntimeException("got duplicate objects!");
+                }
+                objectKeys.clear();
+            }
         }
         System.out.println("Done!");
 
