@@ -12,4 +12,6 @@ public class Constants {
     public static final int ITEM_COUNT = 1000000;
     public static final int RECORDS_PER_UNIQUE = 10000;
     public static final int QUERY_COUNT = 10000;
+
+    public static final int PASSIVE_MEMBER_AUTO_SHUTDOWN_SECONDS = 20;
 }
