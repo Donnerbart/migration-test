@@ -14,6 +14,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.hazelcast.migration.Constants.CLUSTER_SIZE;
+import static com.hazelcast.migration.Constants.RECORDS_PER_UNIQUE;
+import static com.hazelcast.migration.Constants.STRATEGY;
+import static com.hazelcast.migration.Constants.USE_ASYNC_STREAMER;
+import static com.hazelcast.migration.Constants.ITEM_COUNT;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomUtils.nextDouble;
@@ -25,13 +30,13 @@ public class WarmupClient {
     public static void main(String[] args) throws InterruptedException {
         // init cluster
         HazelcastInstance instance = HazelcastClient.newHazelcastClient();
-        waitClusterSize(instance, Constants.CLUSTER_SIZE);
+        waitClusterSize(instance, CLUSTER_SIZE);
 
         ICountDownLatch stopSignal = instance.getCountDownLatch("stopSignal");
         stopSignal.trySetCount(1);
 
         // prepare data
-        int uniqueStringsCount = (int) Math.ceil(Constants.ITEM_COUNT / Constants.RECORDS_PER_UNIQUE);
+        int uniqueStringsCount = (int) Math.ceil(ITEM_COUNT / RECORDS_PER_UNIQUE);
         System.out.println(format("Prepare data (%d unique Strings)...", uniqueStringsCount));
         Set<String> stringsSet = generateUniqueStrings(uniqueStringsCount);
 
@@ -45,10 +50,10 @@ public class WarmupClient {
         // fill map
         System.out.println("Filling map...");
         IMap<String, DomainObject> map = instance.getMap("map");
-        Streamer<String, DomainObject> streamer = StreamerFactory.getInstance(map, Constants.ASYNC_STREAMER);
-        DomainObjectFactory objectFactory = DomainObjectFactory.newFactory(Constants.STRATEGY);
+        Streamer<String, DomainObject> streamer = StreamerFactory.getInstance(map, USE_ASYNC_STREAMER);
+        DomainObjectFactory objectFactory = DomainObjectFactory.newFactory(STRATEGY);
 
-        for (int i = 0; i < Constants.ITEM_COUNT; i++) {
+        for (int i = 0; i < ITEM_COUNT; i++) {
             int index = i % uniqueStringsCount;
             String indexedField = strings[index];
             DomainObject object = createNewDomainObject(objectFactory, indexedField);
