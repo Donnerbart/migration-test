@@ -12,9 +12,9 @@ public class Constants {
 
     public static final int ITEM_COUNT = 1000000;
     public static final int RECORDS_PER_UNIQUE = 10000;
-    public static final int QUERY_COUNT = 10000;
+    public static final int QUERY_COUNT = 100;
 
-    public static final int FIX_OWNED_PARTITION_AT_QUERY_INDEX = 500;
+    public static final int FIX_OWNED_PARTITION_AT_QUERY_INDEX = 50;
 
     public static final int PASSIVE_MEMBER_AUTO_SHUTDOWN_SECONDS = 20;
 }

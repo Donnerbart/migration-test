@@ -10,6 +10,8 @@ public class ShutdownCluster {
         // init cluster
         HazelcastInstance instance = HazelcastClient.newHazelcastClient();
 
+        instance.getMap("map").clear();
+
         ICountDownLatch stopSignal = instance.getCountDownLatch("stopSignal");
         stopSignal.countDown();
 

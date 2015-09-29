@@ -30,6 +30,8 @@ public class ActiveMember {
     public static void main(String[] args) throws InterruptedException {
         HazelcastInstance instance = Hazelcast.newHazelcastInstance();
 
+        logPartitionData(instance);
+
         ICountDownLatch startQueries = instance.getCountDownLatch("startQueries");
         startQueries.trySetCount(1);
 
