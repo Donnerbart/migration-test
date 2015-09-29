@@ -15,12 +15,11 @@ import java.util.Random;
 import java.util.Set;
 
 import static com.hazelcast.migration.Constants.CHECK_QUERY_RESULT;
+import static com.hazelcast.migration.Constants.FIX_OWNED_PARTITION_AT_QUERY_INDEX;
 import static com.hazelcast.migration.Constants.QUERY_COUNT;
 import static com.hazelcast.migration.Constants.RECORDS_PER_UNIQUE;
-import static com.hazelcast.migration.Constants.FIX_OWNED_PARTITION_AT_QUERY_INDEX;
-import static com.hazelcast.migration.Utils.getLocalPartitionsCount;
 import static com.hazelcast.migration.Utils.getMapServiceContext;
-import static com.hazelcast.migration.Utils.getPartitionService;
+import static com.hazelcast.migration.Utils.logPartitionData;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -29,7 +28,6 @@ public class ActiveMember {
 
     public static void main(String[] args) throws InterruptedException {
         HazelcastInstance instance = Hazelcast.newHazelcastInstance();
-
         logPartitionData(instance);
 
         ICountDownLatch startQueries = instance.getCountDownLatch("startQueries");
@@ -88,16 +86,5 @@ public class ActiveMember {
         ICountDownLatch stopSignal = instance.getCountDownLatch("stopSignal");
         stopSignal.await(Integer.MAX_VALUE, DAYS);
         Hazelcast.shutdownAll();
-    }
-
-    private static void logPartitionData(HazelcastInstance instance) {
-        int partitionStateVersion = getPartitionService(instance).getPartitionStateVersion();
-        boolean hasOngoingMigrationLocal = getPartitionService(instance).hasOnGoingMigrationLocal();
-        int localPartitionCount = getLocalPartitionsCount(instance);
-        Collection<Integer> ownedPartitions = getMapServiceContext(instance).getOwnedPartitions();
-        System.out.println(format(
-                "Partition state version: %d, hasOngoingMigrationLocal: %b, local partitions: %d vs. %d, class: %s, content: %s",
-                partitionStateVersion, hasOngoingMigrationLocal, localPartitionCount,
-                ownedPartitions.size(), ownedPartitions.getClass(), ownedPartitions));
     }
 }

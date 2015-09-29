@@ -10,11 +10,13 @@ import com.hazelcast.migration.domain.DomainObjectFactory;
 import com.hazelcast.partition.InternalPartitionService;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import static com.hazelcast.instance.TestUtil.getNode;
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.RandomUtils.nextDouble;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
@@ -32,7 +34,7 @@ public final class Utils {
                 return;
             }
             System.out.println(format("Cluster size is %d/%d", actualClusterSize, clusterSize));
-            Thread.sleep(1000);
+            SECONDS.sleep(1);
         }
     }
 
@@ -77,5 +79,17 @@ public final class Utils {
             }
         }
         return count;
+    }
+
+    public static void logPartitionData(HazelcastInstance instance) {
+        int partitionStateVersion = getPartitionService(instance).getPartitionStateVersion();
+        boolean hasOngoingMigrationLocal = getPartitionService(instance).hasOnGoingMigrationLocal();
+        int localPartitionCount = getLocalPartitionsCount(instance);
+        Collection<Integer> ownedPartitions = getMapServiceContext(instance).getOwnedPartitions();
+        int ownedPartitionCount = ownedPartitions.size();
+
+        System.out.println(format(
+                "Partition state version: %d, hasOngoingMigrationLocal: %b, local partitions: %d vs. %d, ownedPartitions: %s",
+                partitionStateVersion, hasOngoingMigrationLocal, localPartitionCount, ownedPartitionCount, ownedPartitions));
     }
 }
