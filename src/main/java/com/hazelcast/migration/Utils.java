@@ -4,11 +4,12 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
 import com.hazelcast.core.Partition;
 import com.hazelcast.map.impl.MapService;
+import com.hazelcast.map.impl.MapServiceContext;
 import com.hazelcast.migration.domain.DomainObject;
 import com.hazelcast.migration.domain.DomainObjectFactory;
+import com.hazelcast.partition.InternalPartitionService;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public final class Utils {
     private Utils() {
     }
 
-    static void waitClusterSize(HazelcastInstance hz, int clusterSize) throws InterruptedException {
+    public static void waitClusterSize(HazelcastInstance hz, int clusterSize) throws InterruptedException {
         while (true) {
             int actualClusterSize = hz.getCluster().getMembers().size();
             if (actualClusterSize >= clusterSize) {
@@ -35,7 +36,7 @@ public final class Utils {
         }
     }
 
-    static Set<String> generateUniqueStrings(int uniqueStringsCount) {
+    public static Set<String> generateUniqueStrings(int uniqueStringsCount) {
         Set<String> stringsSet = new HashSet<String>(uniqueStringsCount);
         do {
             String randomString = RandomStringUtils.randomAlphabetic(30);
@@ -44,7 +45,7 @@ public final class Utils {
         return stringsSet;
     }
 
-    static DomainObject createNewDomainObject(DomainObjectFactory objectFactory, String indexedField) {
+    public static DomainObject createNewDomainObject(DomainObjectFactory objectFactory, String indexedField) {
         DomainObject object = objectFactory.newInstance();
         object.setKey(randomAlphanumeric(7));
         object.setStringVal(indexedField);
@@ -54,7 +55,19 @@ public final class Utils {
         return object;
     }
 
-    static int getLocalPartitionsCount(HazelcastInstance instance) {
+    public static InternalPartitionService getPartitionService(HazelcastInstance instance) {
+        return getNode(instance).getNodeEngine().getPartitionService();
+    }
+
+    public static MapService getMapService(HazelcastInstance instance) {
+        return (MapService) getNode(instance).getNodeEngine().getService(MapService.SERVICE_NAME);
+    }
+
+    public static MapServiceContext getMapServiceContext(HazelcastInstance instance) {
+        return getMapService(instance).getMapServiceContext();
+    }
+
+    public static int getLocalPartitionsCount(HazelcastInstance instance) {
         Member localMember = instance.getCluster().getLocalMember();
         Set<Partition> partitions = instance.getPartitionService().getPartitions();
         int count = 0;
@@ -64,14 +77,5 @@ public final class Utils {
             }
         }
         return count;
-    }
-
-    public static Collection<Integer> getOwnedPartitions(HazelcastInstance instance) {
-        MapService mapService = getMapService(instance);
-        return mapService.getMapServiceContext().getOwnedPartitions();
-    }
-
-    private static MapService getMapService(HazelcastInstance instance) {
-        return (MapService) getNode(instance).getNodeEngine().getService(MapService.SERVICE_NAME);
     }
 }

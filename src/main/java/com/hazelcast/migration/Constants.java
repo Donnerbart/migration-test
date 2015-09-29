@@ -14,6 +14,7 @@ public class Constants {
     public static final int RECORDS_PER_UNIQUE = 10000;
     public static final int QUERY_COUNT = 10000;
 
-    public static final int REPORT_PARTITION_COUNT_INTERVAL = 50;
+    public static final int FIX_OWNED_PARTITION_AT_QUERY_INDEX = 500;
+
     public static final int PASSIVE_MEMBER_AUTO_SHUTDOWN_SECONDS = 20;
 }

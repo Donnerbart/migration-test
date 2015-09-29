@@ -17,9 +17,10 @@ import java.util.Set;
 import static com.hazelcast.migration.Constants.CHECK_QUERY_RESULT;
 import static com.hazelcast.migration.Constants.QUERY_COUNT;
 import static com.hazelcast.migration.Constants.RECORDS_PER_UNIQUE;
-import static com.hazelcast.migration.Constants.REPORT_PARTITION_COUNT_INTERVAL;
+import static com.hazelcast.migration.Constants.FIX_OWNED_PARTITION_AT_QUERY_INDEX;
 import static com.hazelcast.migration.Utils.getLocalPartitionsCount;
-import static com.hazelcast.migration.Utils.getOwnedPartitions;
+import static com.hazelcast.migration.Utils.getMapServiceContext;
+import static com.hazelcast.migration.Utils.getPartitionService;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -43,6 +44,8 @@ public class ActiveMember {
         ISet<String> set = instance.getSet("set");
         String[] uniqueStrings = set.toArray(new String[set.size()]);
         System.out.println("Done!");
+
+        logPartitionData(instance);
 
         // query map
         System.out.println("Starting queries...");
@@ -70,11 +73,10 @@ public class ActiveMember {
                 }
                 objectKeys.clear();
             }
-            if (i % REPORT_PARTITION_COUNT_INTERVAL == 0) {
-                int localPartitionCount = getLocalPartitionsCount(instance);
-                Collection<Integer> ownedPartitions = getOwnedPartitions(instance);
-                System.out.println(format("Local partitions: %d vs. %d: %s", localPartitionCount, ownedPartitions.size(),
-                        ownedPartitions));
+            if (i == FIX_OWNED_PARTITION_AT_QUERY_INDEX) {
+                logPartitionData(instance);
+                getMapServiceContext(instance).reloadOwnedPartitions();
+                logPartitionData(instance);
             }
         }
         System.out.println("Done!");
@@ -84,5 +86,16 @@ public class ActiveMember {
         ICountDownLatch stopSignal = instance.getCountDownLatch("stopSignal");
         stopSignal.await(Integer.MAX_VALUE, DAYS);
         Hazelcast.shutdownAll();
+    }
+
+    private static void logPartitionData(HazelcastInstance instance) {
+        int partitionStateVersion = getPartitionService(instance).getPartitionStateVersion();
+        boolean hasOngoingMigrationLocal = getPartitionService(instance).hasOnGoingMigrationLocal();
+        int localPartitionCount = getLocalPartitionsCount(instance);
+        Collection<Integer> ownedPartitions = getMapServiceContext(instance).getOwnedPartitions();
+        System.out.println(format(
+                "Partition state version: %d, hasOngoingMigrationLocal: %b, local partitions: %d vs. %d, class: %s, content: %s",
+                partitionStateVersion, hasOngoingMigrationLocal, localPartitionCount,
+                ownedPartitions.size(), ownedPartitions.getClass(), ownedPartitions));
     }
 }
