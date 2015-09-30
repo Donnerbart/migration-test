@@ -8,6 +8,7 @@ import com.hazelcast.map.impl.MapServiceContext;
 import com.hazelcast.migration.domain.DomainObject;
 import com.hazelcast.migration.domain.DomainObjectFactory;
 import com.hazelcast.partition.InternalPartitionService;
+import com.hazelcast.spi.impl.NodeEngineImpl;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Collection;
@@ -57,12 +58,16 @@ public final class Utils {
         return object;
     }
 
+    public static NodeEngineImpl getNodeEngine(HazelcastInstance instance) {
+        return getNode(instance).getNodeEngine();
+    }
+
     public static InternalPartitionService getPartitionService(HazelcastInstance instance) {
-        return getNode(instance).getNodeEngine().getPartitionService();
+        return getNodeEngine(instance).getPartitionService();
     }
 
     public static MapService getMapService(HazelcastInstance instance) {
-        return (MapService) getNode(instance).getNodeEngine().getService(MapService.SERVICE_NAME);
+        return (MapService) getNodeEngine(instance).getService(MapService.SERVICE_NAME);
     }
 
     public static MapServiceContext getMapServiceContext(HazelcastInstance instance) {
