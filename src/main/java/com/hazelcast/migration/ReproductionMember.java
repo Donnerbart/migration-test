@@ -5,7 +5,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ICountDownLatch;
 
 import static com.hazelcast.migration.Constants.CLUSTER_SIZE;
-import static com.hazelcast.migration.Utils.logPartitionData;
+import static com.hazelcast.migration.Utils.logPartitionState;
 import static com.hazelcast.migration.Utils.waitClusterSize;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -26,7 +26,7 @@ public class ReproductionMember {
         latch.await(Integer.MAX_VALUE, DAYS);
 
         while (true) {
-            logPartitionData(instance);
+            logPartitionState(instance);
             SECONDS.sleep(5);
         }
     }

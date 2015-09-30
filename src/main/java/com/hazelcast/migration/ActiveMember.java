@@ -19,7 +19,7 @@ import static com.hazelcast.migration.Constants.FIX_OWNED_PARTITION_AT_QUERY_IND
 import static com.hazelcast.migration.Constants.QUERY_COUNT;
 import static com.hazelcast.migration.Constants.RECORDS_PER_UNIQUE;
 import static com.hazelcast.migration.Utils.getMapServiceContext;
-import static com.hazelcast.migration.Utils.logPartitionData;
+import static com.hazelcast.migration.Utils.logPartitionState;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -28,7 +28,7 @@ public class ActiveMember {
 
     public static void main(String[] args) throws InterruptedException {
         HazelcastInstance instance = Hazelcast.newHazelcastInstance();
-        logPartitionData(instance);
+        logPartitionState(instance);
 
         ICountDownLatch startQueries = instance.getCountDownLatch("startQueries");
         startQueries.trySetCount(1);
@@ -45,7 +45,7 @@ public class ActiveMember {
         String[] uniqueStrings = set.toArray(new String[set.size()]);
         System.out.println("Done!");
 
-        logPartitionData(instance);
+        logPartitionState(instance);
 
         // query map
         System.out.println("Starting queries...");
@@ -74,9 +74,9 @@ public class ActiveMember {
                 objectKeys.clear();
             }
             if (i == FIX_OWNED_PARTITION_AT_QUERY_INDEX) {
-                logPartitionData(instance);
+                logPartitionState(instance);
                 getMapServiceContext(instance).reloadOwnedPartitions();
-                logPartitionData(instance);
+                logPartitionState(instance);
             }
         }
         System.out.println("Done!");

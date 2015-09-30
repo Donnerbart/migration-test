@@ -81,7 +81,7 @@ public final class Utils {
         return count;
     }
 
-    public static void logPartitionData(HazelcastInstance instance) {
+    public static void logPartitionState(HazelcastInstance instance) {
         int partitionStateVersion = getPartitionService(instance).getPartitionStateVersion();
         boolean hasOngoingMigrationLocal = getPartitionService(instance).hasOnGoingMigrationLocal();
         int localPartitionCount = getLocalPartitionsCount(instance);
