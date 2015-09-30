@@ -4,7 +4,6 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ICountDownLatch;
 
-import static com.hazelcast.migration.Utils.getMapServiceContext;
 import static com.hazelcast.migration.Utils.logPartitionData;
 import static com.hazelcast.migration.Utils.waitClusterSize;
 import static java.util.concurrent.TimeUnit.DAYS;
@@ -27,13 +26,11 @@ public class ReproductionMember {
             latch.countDown();
         }
         latch.await(Integer.MAX_VALUE, DAYS);
-
-        logPartitionData(instance);
-        System.out.println("Updating owned partitions...");
-        getMapServiceContext(instance).reloadOwnedPartitions();
         logPartitionData(instance);
 
-        SECONDS.sleep(5);
-        Hazelcast.shutdownAll();
+        while (true) {
+            SECONDS.sleep(5);
+            logPartitionData(instance);
+        }
     }
 }
