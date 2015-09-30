@@ -21,13 +21,14 @@ public class ReproductionMember {
 
         if (instance.getCluster().getLocalMember().getAddress().getPort() == 5701) {
             waitClusterSize(instance, CLUSTER_SIZE);
+            SECONDS.sleep(1);
             latch.countDown();
         }
         latch.await(Integer.MAX_VALUE, DAYS);
 
         while (true) {
             logPartitionState(instance);
-            SECONDS.sleep(5);
+            SECONDS.sleep(10);
         }
     }
 }
