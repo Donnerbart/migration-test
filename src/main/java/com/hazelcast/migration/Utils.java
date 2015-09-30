@@ -89,7 +89,7 @@ public final class Utils {
         int ownedPartitionCount = ownedPartitions.size();
 
         System.out.println(format(
-                "Partition state version: %d, hasOngoingMigrationLocal: %b, local partitions: %d vs. %d, ownedPartitions: %s",
+                "Partition state version: %d, hasOngoingMigrationLocal: %b, local partitions: %d, ownedPartitions (%d): %s",
                 partitionStateVersion, hasOngoingMigrationLocal, localPartitionCount, ownedPartitionCount, ownedPartitions));
     }
 }
