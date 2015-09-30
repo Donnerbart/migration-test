@@ -4,6 +4,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ICountDownLatch;
 
+import static com.hazelcast.migration.Constants.CLUSTER_SIZE;
 import static com.hazelcast.migration.Utils.logPartitionData;
 import static com.hazelcast.migration.Utils.waitClusterSize;
 import static java.util.concurrent.TimeUnit.DAYS;
@@ -13,24 +14,20 @@ public class ReproductionMember {
 
     public static void main(String[] args) throws InterruptedException {
         HazelcastInstance instance = Hazelcast.newHazelcastInstance();
-
         System.out.println("Instance started...");
-        logPartitionData(instance);
 
         ICountDownLatch latch = instance.getCountDownLatch("latch");
         latch.trySetCount(1);
 
         if (instance.getCluster().getLocalMember().getAddress().getPort() == 5701) {
-            waitClusterSize(instance, 3);
-            SECONDS.sleep(5);
+            waitClusterSize(instance, CLUSTER_SIZE);
             latch.countDown();
         }
         latch.await(Integer.MAX_VALUE, DAYS);
-        logPartitionData(instance);
 
         while (true) {
-            SECONDS.sleep(5);
             logPartitionData(instance);
+            SECONDS.sleep(5);
         }
     }
 }
